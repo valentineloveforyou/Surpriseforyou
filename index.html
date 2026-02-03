@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Valentine's Proposal</title>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Pacifico&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Pacifico", cursive;
+        background: linear-gradient(135deg, #ff9a9e, #fecfef);
+        color: #d63384;
+        height: 100vh;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .app {
+        width: 100%;
+        max-width: 600px;
+        text-align: center;
+        padding: 20px;
+      }
+
+      section {
+        display: none;
+      }
+
+      section.active {
+        display: block;
+      }
+
+      .illustration,
+      .final-img {
+        width: 180px;
+        height: 180px;
+        margin: 0 auto 20px;
+        border-radius: 50%;
+        object-fit: cover;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      }
+
+      .illustration {
+        background: url("https://i.postimg.cc/TPJYV0Qs/Teddy.jpg") no-repeat
+          center/cover;
+      }
+
+      h1 {
+        font-family: "Dancing Script", cursive;
+        font-size: 2.3rem;
+        margin-bottom: 10px;
+      }
+
+      p {
+        margin-bottom: 15px;
+        font-size: 1.1rem;
+      }
+
+      .buttons {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+      }
+
+      button {
+        font-family: "Pacifico", cursive;
+        font-size: 1.3rem;
+        padding: 12px 30px;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+
+      #yes-btn {
+        background: #ff6b9d;
+        color: white;
+      }
+
+      #no-btn {
+        background: #dcedc8;
+        color: #c2185b;
+        position: relative;
+      }
+
+      input {
+        width: 80%;
+        padding: 12px;
+        border-radius: 30px;
+        border: none;
+        margin: 10px 0 20px;
+        font-family: "Pacifico", cursive;
+        text-align: center;
+        font-size: 1.1rem;
+      }
+
+      .submit-btn {
+        background: #c44569;
+        color: white;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="app">
+      <!-- PAGE 1 -->
+      <section id="proposal" class="active">
+        <div class="illustration"></div>
+        <h1>Will you be my Valentine? ❤️</h1>
+        <p>Choose wisely</p>
+        <div class="buttons">
+          <button id="yes-btn">Yes 💖</button>
+          <button id="no-btn">No 🙅‍♀️</button>
+        </div>
+      </section>
+
+      <!-- PAGE 2 -->
+      <section id="success">
+        <img
+          src="https://i.postimg.cc/LXq9cSmX/Teddy2.jpg"
+          class="illustration"
+        />
+        <h1>Good choice 💕</h1>
+        <p>
+          You chose the right person.<br />
+          I knew you would make the right decision.<br />
+          You’ve made me the happiest person in the world ❤️
+        </p>
+
+        <p><strong>By which cute name should I call you? 🥰</strong></p>
+        <input type="text" id="nameInput" placeholder="Enter your cute name" />
+        <br />
+        <button class="submit-btn" id="submitName">Submit 💖</button>
+      </section>
+
+      <!-- PAGE 3 -->
+      <section id="final">
+        <img
+          src="https://i.postimg.cc/7Ybb2bbY/Teddy-3.jpg"
+          class="final-img"
+        />
+        <h1 id="finalText"></h1>
+      </section>
+    </div>
+
+    <script>
+      const proposal = document.getElementById("proposal");
+      const success = document.getElementById("success");
+      const finalPage = document.getElementById("final");
+
+      const yesBtn = document.getElementById("yes-btn");
+      const noBtn = document.getElementById("no-btn");
+
+      const submitBtn = document.getElementById("submitName");
+      const nameInput = document.getElementById("nameInput");
+      const finalText = document.getElementById("finalText");
+
+      // Detect mobile device
+      const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+      // Yes button goes to next page
+      yesBtn.onclick = () => {
+        proposal.classList.remove("active");
+        success.classList.add("active");
+      };
+
+      // Function to move No button randomly
+      function moveNoButtonRandom() {
+        const x = Math.random() * (window.innerWidth - noBtn.offsetWidth);
+        const y = Math.random() * (window.innerHeight - noBtn.offsetHeight);
+        noBtn.style.position = "absolute";
+        noBtn.style.left = x + "px";
+        noBtn.style.top = y + "px";
+      }
+
+      // Desktop: move on hover, mobile: move continuously
+      if (!isMobile) {
+        noBtn.addEventListener("mouseenter", moveNoButtonRandom);
+        noBtn.addEventListener("click", moveNoButtonRandom);
+      } else {
+        setInterval(moveNoButtonRandom, 500); // move every 0.5s on mobile
+      }
+
+      // Submit name → send to Formspree → go to final page
+      submitBtn.onclick = async () => {
+        const name = nameInput.value.trim();
+        if (!name) {
+          alert("Please enter a cute name 💕");
+          return;
+        }
+
+        try {
+          // Send data to Formspree
+          await fetch("https://formspree.io/f/mreljnpp", {
+            method: "POST",
+            headers: {
+              "Accept": "application/json",
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              name: name,
+              answer: "Yes"
+            })
+          });
+
+          // Show final page
+          success.classList.remove("active");
+          finalPage.classList.add("active");
+          finalText.innerHTML = `Happy Valentine’s Day,<br>${name} 💖`;
+
+        } catch (error) {
+          alert("Something went wrong 😢 Please try again.");
+        }
+      };
+    </script>
+  </body>
+</html>
